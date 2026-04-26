@@ -1,0 +1,25 @@
+{
+  "name": "AutoAdress",
+  "short_name": "AutoAdress",
+  "description": "",
+  "start_url": "/aumowebadress/",
+  "scope": "/aumowebadress/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff4015",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/aumowebadress/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/aumowebadress/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
