@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海外通販 住所自動入力ジェネレーター</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px 15px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 12px 15px;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            color: #1e3a8a;
+            border-radius: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: normal;
+            margin-left: 5px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #resultArea {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            resize: none;
+            margin-bottom: 10px;
+            background-color: #f1f5f9;
+        }
+
+        .instruction {
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        .instruction h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .instruction ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .instruction li {
+            margin-bottom: 8px;
+        }
+
+        /* PC用のドラッグ＆ドロップボタン */
+        .bookmarklet-btn {
+            display: inline-block;
+            background-color: #10b981;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 10px 0;
+            cursor: grab;
+        }
+        
+        .pc-only { display: none; }
+
+        @media (min-width: 768px) {
+            body { padding: 40px 20px; }
+            .header h1 { font-size: 2rem; }
+            .pc-only { display: block; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+  <link rel="manifest" href="/aumowebadress/manifest.json">
+  <meta name="theme-color" content="#ff4015">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AutoAdress">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/aumowebadress/icon-192.png">
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/aumowebadress/sw.js').catch(()=>{});});}</script>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>海外通販 住所自動入力ツール</h1>
+        <p>面倒な英語での住所入力をワンクリックで終わらせる<br>あなた専用のブックマークレットを作成します。</p>
+    </div>
+
+    <div class="card">
+        <div class="alert-info">
+            <strong>🔒 安全・安心設計：</strong><br>
+            入力された情報はあなたのブラウザ内でのみ処理されます。外部サーバーに送信・保存されることは一切ありません。
+        </div>
+
+        <form id="generatorForm">
+            <div class="form-group">
+                <label>メールアドレス</label>
+                <input type="email" id="email" placeholder="example@gmail.com" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>名 (First Name) <span class="hint">ローマ字</span></label>
+                    <input type="text" id="firstName" placeholder="Taro" required>
+                </div>
+                <div class="form-group">
+                    <label>姓 (Last Name) <span class="hint">ローマ字</span></label>
+                    <input type="text" id="lastName" placeholder="Yamada" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>郵便番号</label>
+                <input type="text" id="postalCode" placeholder="123-4567" required>
+            </div>
+
+            <div class="form-group">
+                <label>市区町村 (City) <span class="hint">ローマ字</span></label>
+                <input type="text" id="city" placeholder="Shibuya-ku" required>
+            </div>
+
+            <div class="form-group">
+                <label>町名・番地 (Address) <span class="hint">ローマ字</span></label>
+                <input type="text" id="address1" placeholder="1-2-3 Jinnan" required>
+            </div>
+
+            <div class="form-group">
+                <label>建物名・部屋番号 <span class="hint">ローマ字（任意）</span></label>
+                <input type="text" id="address2" placeholder="Apartment 101">
+            </div>
+
+            <div class="form-group">
+                <label>電話番号</label>
+                <input type="tel" id="phone" placeholder="09012345678" required>
+            </div>
+
+            <button type="submit" id="generateBtn">ブックマークレットを作成する</button>
+        </form>
+    </div>
+
+    <div id="resultArea" class="card">
+        <h2 style="font-size: 1.2rem; color: var(--primary); margin-bottom: 15px;">🎉 完成しました！</h2>
+        
+        <div class="pc-only" style="margin-bottom: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <strong>【PCの方】簡単な登録方法</strong><br>
+            以下の緑色のボタンをクリックしたまま、ブラウザの「ブックマークバー」までドラッグ＆ドロップしてください。<br>
+            <a href="#" id="dragButton" class="bookmarklet-btn">📦 住所自動入力</a>
+        </div>
+
+        <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>【スマホの方】コードをコピーして登録</strong></p>
+        <textarea id="outputCode" readonly></textarea>
+        <button type="button" id="copyBtn" style="background-color: #475569;">コードをコピーする</button>
+
+        <div class="instruction">
+            <h3>📱 スマホ（Safari / Chrome）での登録方法</h3>
+            <ol>
+                <li>上の「コードをコピーする」ボタンを押す。</li>
+                <li>このページ（または任意のページ）を一度ブックマークに追加する。</li>
+                <li>ブックマークの「編集」画面を開く。</li>
+                <li>名前を「住所自動入力」などに変更し、<strong>URLの欄をすべて消してコピーしたコードを貼り付ける。</strong></li>
+                <li>保存して完了！海外通販の決済画面でこのブックマークをタップしてください。</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('generatorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 入力値の取得とエスケープ（シングルクォート対策）
+    const escapeStr = (str) => str.replace(/'/g, "\\'");
+    
+    const data = {
+        email: escapeStr(document.getElementById('email').value),
+        firstName: escapeStr(document.getElementById('firstName').value),
+        lastName: escapeStr(document.getElementById('lastName').value),
+        postalCode: escapeStr(document.getElementById('postalCode').value),
+        city: escapeStr(document.getElementById('city').value),
+        address1: escapeStr(document.getElementById('address1').value),
+        address2: escapeStr(document.getElementById('address2').value),
+        phone: escapeStr(document.getElementById('phone').value)
+    };
+
+    // 圧縮されたJSコードの生成
+    const jsCode = `javascript:(function(){const d={'email':'${data.email}','lastName':'${data.lastName}','firstName':'${data.firstName}','postalCode':'${data.postalCode}','city':'${data.city}','address1':'${data.address1}','address2':'${data.address2}','phone':'${data.phone}'};const m={'email':['email'],'lastName':['lastName','family-name','last_name'],'firstName':['firstName','given-name','first_name'],'postalCode':['postalCode','postal-code','zip'],'city':['city','address-level2'],'address1':['address1','address-line1'],'address2':['address2','address-line2'],'phone':['phone','tel']};for(let k in d){let el=null;for(let n of m[k]){el=document.querySelector(\`input[name="\${n}"], input[name*="[\${n}]"], input[autocomplete="\${n}"]\`);if(el)break;}if(el&&d[k]){el.value=d[k];el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}}alert('自動入力を実行しました！\\n都道府県の選択や未入力項目がないか確認してください。');})();`;
+
+    // 結果エリアに表示
+    document.getElementById('outputCode').value = jsCode;
+    document.getElementById('dragButton').href = jsCode;
+    
+    // アニメーション付きで表示
+    const resultArea = document.getElementById('resultArea');
+    resultArea.style.display = 'block';
+    
+    // スクロールして結果を見せる
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// コピーボタンの処理
+document.getElementById('copyBtn').addEventListener('click', function() {
+    const code = document.getElementById('outputCode');
+    code.select();
+    document.execCommand('copy');
+    
+    const originalText = this.innerText;
+    this.innerText = '✅ コピーしました！';
+    this.style.backgroundColor = '#10b981';
+    
+    setTimeout(() => {
+        this.innerText = originalText;
+        this.style.backgroundColor = '#475569';
+    }, 2000);
+});
+</script>
+
+</body>
+</html>
